@@ -1,2 +1,21 @@
 @import "tailwindcss";
 @import "tailwind-scrollbar-hide/v4";
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: black;
+  color: white;
+}
+ul > li {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+li:hover {
+  color: gray;
+  text-decoration: underline;
+}
+
+.hero-image {
+  mask-image: linear-gradient(to right, transparent, black 75%);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 75%);
+}

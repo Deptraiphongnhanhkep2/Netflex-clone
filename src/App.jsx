@@ -1,10 +1,10 @@
 import React from "react";
-import TitleCards from "./components/TitleCards";
+import Home from "./pages/Home";
 
 function App() {
   return (
     <div>
-      <TitleCards />
+    <Home/>
     </div>
   );
 }

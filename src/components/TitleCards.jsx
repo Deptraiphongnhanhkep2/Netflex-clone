@@ -1,125 +1,74 @@
 import React, { useEffect, useRef } from "react";
 import Cards from "../assets/cards/Cards_data";
 
-function TitleCards() {
+function TitleCards({title,category}) {
   const cardsRef = useRef(null);
   const isDown = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
   const moved = useRef(false);
+  const SCROLL_SPEED = 1.5;
 
   useEffect(() => {
     const el = cardsRef.current;
     if (!el) return;
 
-    // Cuộn ngang khi lăn chuột (mượt + nhanh hơn)
     const handleWheel = (e) => {
       e.preventDefault();
-      el.scrollBy({
-        left: e.deltaY * 3, // 👈 tăng tốc cuộn
-        behavior: "smooth", // 👈 cuộn mượt
-      });
+      el.scrollBy({ left: e.deltaY * 3, behavior: "smooth" });
     };
 
-    // ---- Desktop drag ----
-    const handleMouseDown = (e) => {
+    const start = (pageX) => {
       isDown.current = true;
-      startX.current = e.pageX - el.offsetLeft;
+      startX.current = pageX - el.offsetLeft;
       scrollLeft.current = el.scrollLeft;
       moved.current = false;
     };
 
-    const handleMouseLeave = () => {
-      isDown.current = false;
-    };
-
-    const handleMouseUp = () => {
-      isDown.current = false;
-    };
-
-    const handleMouseMove = (e) => {
+    const move = (pageX) => {
       if (!isDown.current) return;
-      e.preventDefault();
-      const x = e.pageX - el.offsetLeft;
-      const walk = (x - startX.current) * 1.5;
-
-      if (Math.abs(walk) > 5) {
-        moved.current = true; // có kéo
-      }
-
+      const x = pageX - el.offsetLeft;
+      const walk = (x - startX.current) * SCROLL_SPEED;
+      if (Math.abs(walk) > 5) moved.current = true;
       el.scrollLeft = scrollLeft.current - walk;
     };
 
-    // ---- Mobile touch ----
-    const handleTouchStart = (e) => {
-      isDown.current = true;
-      startX.current = e.touches[0].pageX - el.offsetLeft;
-      scrollLeft.current = el.scrollLeft;
-      moved.current = false;
-    };
-
-    const handleTouchEnd = () => {
+    const end = () => {
       isDown.current = false;
     };
 
-    const handleTouchMove = (e) => {
-      if (!isDown.current) return;
-      const x = e.touches[0].pageX - el.offsetLeft;
-      const walk = (x - startX.current) * 1.5;
-
-      if (Math.abs(walk) > 5) {
-        moved.current = true;
-      }
-
-      el.scrollLeft = scrollLeft.current - walk;
-    };
-
-    // Gắn sự kiện
+    // Mouse events
     el.addEventListener("wheel", handleWheel, { passive: false });
-    el.addEventListener("mousedown", handleMouseDown);
-    el.addEventListener("mouseleave", handleMouseLeave);
-    el.addEventListener("mouseup", handleMouseUp);
-    el.addEventListener("mousemove", handleMouseMove);
+    el.addEventListener("mousedown", (e) => start(e.pageX));
+    el.addEventListener("mousemove", (e) => move(e.pageX));
+    el.addEventListener("mouseup", end);
+    el.addEventListener("mouseleave", end);
 
-    el.addEventListener("touchstart", handleTouchStart);
-    el.addEventListener("touchend", handleTouchEnd);
-    el.addEventListener("touchmove", handleTouchMove);
+    // Touch events
+    el.addEventListener("touchstart", (e) => start(e.touches[0].pageX));
+    el.addEventListener("touchmove", (e) => move(e.touches[0].pageX));
+    el.addEventListener("touchend", end);
 
-    // Cleanup
     return () => {
       el.removeEventListener("wheel", handleWheel);
-      el.removeEventListener("mousedown", handleMouseDown);
-      el.removeEventListener("mouseleave", handleMouseLeave);
-      el.removeEventListener("mouseup", handleMouseUp);
-      el.removeEventListener("mousemove", handleMouseMove);
-
-      el.removeEventListener("touchstart", handleTouchStart);
-      el.removeEventListener("touchend", handleTouchEnd);
-      el.removeEventListener("touchmove", handleTouchMove);
     };
   }, []);
 
-  const handleCardClick = (name) => {
-    if (moved.current) return; // Nếu vừa drag thì bỏ qua click
-    alert(`Clicked ${name}`);
-  };
-
   return (
-    <div className="mt-12 mb-8">
-      <h2 className="text-2xl font-bold text-white mb-4">
-        Popular on Netflex
-      </h2>
+    <div className="mt-12 mb-8 p-6">
+      <h2 className="text-2xl font-bold text-white mb-4">{title?title: "Popular on Netflex"} </h2>
       <div
         ref={cardsRef}
-        className="flex overflow-x-scroll gap-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none"
+        className="flex overflow-x-auto gap-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none scroll-smooth"
       >
         {Cards.map(({ image, name }, index) => (
           <div key={index} className="flex gap-2.5 relative">
             <img
               src={image}
               alt={name}
-              className="w-60 rounded-sm cursor-pointer shrink-0"
-              onClick={() => handleCardClick(name)}
+              className="w-60 rounded-sm cursor-pointer shrink-0 
+                         transition-transform duration-300 ease-in-out 
+                          hover:z-10 hover:shadow-xl"
             />
             <p className="absolute bottom-2.5 right-2.5 text-white">{name}</p>
           </div>
