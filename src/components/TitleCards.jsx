@@ -1,13 +1,30 @@
 import React, { useEffect, useRef } from "react";
 import Cards from "../assets/cards/Cards_data";
 
-function TitleCards({title,category}) {
+function TitleCards({ title, category }) {
   const cardsRef = useRef(null);
   const isDown = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
   const moved = useRef(false);
   const SCROLL_SPEED = 1.5;
+
+  const options = {
+    method: "GET",
+    headers: {
+      accept: "application/json",
+      Authorization:
+        "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI4OTFiY2VkZjE2MmYzYzc4MTg5M2Y1Njk2MjY4MTZiZiIsIm5iZiI6MTc1ODI3NDc1MS4yMDMsInN1YiI6IjY4Y2QyNGJmMjllM2MwMzMzMjM4MmRlNCIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.RNREPSRtVmW8rQ6YvzYBbx0SWYDecanarHaZnMPspY4",
+    },
+  };
+
+  fetch(
+    "https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1",
+    options
+  )
+    .then((res) => res.json())
+    .then((res) => console.log(res))
+    .catch((err) => console.error(err));
 
   useEffect(() => {
     const el = cardsRef.current;
@@ -56,7 +73,9 @@ function TitleCards({title,category}) {
 
   return (
     <div className="mt-12 mb-8 p-6">
-      <h2 className="text-2xl font-bold text-white mb-4">{title?title: "Popular on Netflex"} </h2>
+      <h2 className="text-2xl font-bold text-white mb-4">
+        {title ? title : "Popular on Netflex"}{" "}
+      </h2>
       <div
         ref={cardsRef}
         className="flex overflow-x-auto gap-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none scroll-smooth"
