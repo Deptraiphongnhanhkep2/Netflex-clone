@@ -1,13 +1,13 @@
-import React, { useEffect, useRef } from "react";
-import Cards from "../assets/cards/Cards_data";
+import React, { useEffect, useRef, useState } from "react";
 
 function TitleCards({ title, category }) {
   const cardsRef = useRef(null);
+  const [apiData, setApiData] = useState([]);
+
+  const SCROLL_SPEED = 1.5;
   const isDown = useRef(false);
   const startX = useRef(0);
   const scrollLeft = useRef(0);
-  const moved = useRef(false);
-  const SCROLL_SPEED = 1.5;
 
   const options = {
     method: "GET",
@@ -18,14 +18,26 @@ function TitleCards({ title, category }) {
     },
   };
 
-  fetch(
-    "https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1",
-    options
-  )
-    .then((res) => res.json())
-    .then((res) => console.log(res))
-    .catch((err) => console.error(err));
+  // Fetch movies
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const res = await fetch(
+          `https://api.themoviedb.org/3/movie/${
+            category ?? "now_playing"
+          }?language=en-US&page=1`,
+          options
+        );
+        const data = await res.json();
+        setApiData(data.results || []);
+      } catch (err) {
+        console.error("Error fetching movies:", err);
+      }
+    };
+    fetchMovies();
+  }, [category]);
 
+  // Scroll/drag logic
   useEffect(() => {
     const el = cardsRef.current;
     if (!el) return;
@@ -39,14 +51,12 @@ function TitleCards({ title, category }) {
       isDown.current = true;
       startX.current = pageX - el.offsetLeft;
       scrollLeft.current = el.scrollLeft;
-      moved.current = false;
     };
 
     const move = (pageX) => {
       if (!isDown.current) return;
       const x = pageX - el.offsetLeft;
       const walk = (x - startX.current) * SCROLL_SPEED;
-      if (Math.abs(walk) > 5) moved.current = true;
       el.scrollLeft = scrollLeft.current - walk;
     };
 
@@ -54,42 +64,50 @@ function TitleCards({ title, category }) {
       isDown.current = false;
     };
 
-    // Mouse events
+    // Event bindings
     el.addEventListener("wheel", handleWheel, { passive: false });
     el.addEventListener("mousedown", (e) => start(e.pageX));
     el.addEventListener("mousemove", (e) => move(e.pageX));
     el.addEventListener("mouseup", end);
     el.addEventListener("mouseleave", end);
-
-    // Touch events
     el.addEventListener("touchstart", (e) => start(e.touches[0].pageX));
     el.addEventListener("touchmove", (e) => move(e.touches[0].pageX));
     el.addEventListener("touchend", end);
 
     return () => {
       el.removeEventListener("wheel", handleWheel);
+      el.removeEventListener("mousedown", (e) => start(e.pageX));
+      el.removeEventListener("mousemove", (e) => move(e.pageX));
+      el.removeEventListener("mouseup", end);
+      el.removeEventListener("mouseleave", end);
+      el.removeEventListener("touchstart", (e) => start(e.touches[0].pageX));
+      el.removeEventListener("touchmove", (e) => move(e.touches[0].pageX));
+      el.removeEventListener("touchend", end);
     };
   }, []);
 
   return (
     <div className="mt-12 mb-8 p-6">
       <h2 className="text-2xl font-bold text-white mb-4">
-        {title ? title : "Popular on Netflex"}{" "}
+        {title || "Popular on Netflix"}
       </h2>
+
       <div
         ref={cardsRef}
         className="flex overflow-x-auto gap-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none scroll-smooth"
       >
-        {Cards.map(({ image, name }, index) => (
-          <div key={index} className="flex gap-2.5 relative">
+        {apiData.map((movie) => (
+          <div key={movie.id} className="flex gap-2.5 relative">
             <img
-              src={image}
-              alt={name}
+              src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
+              alt={movie.original_title}
               className="w-60 rounded-sm cursor-pointer shrink-0 
                          transition-transform duration-300 ease-in-out 
-                          hover:z-10 hover:shadow-xl"
+                         hover:z-10 hover:shadow-xl"
             />
-            <p className="absolute bottom-2.5 right-2.5 text-white">{name}</p>
+            <p className="absolute bottom-2.5 right-2.5 text-white">
+              {movie.original_title}
+            </p>
           </div>
         ))}
       </div>
