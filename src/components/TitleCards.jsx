@@ -46,13 +46,11 @@ function TitleCards({ title, category }) {
     const el = cardsRef.current;
     if (!el) return;
 
-    // Horizontal scroll with mouse wheel
     const handleWheel = (e) => {
       e.preventDefault();
       el.scrollBy({ left: e.deltaY * 3, behavior: "smooth" });
     };
 
-    // Dragging helpers
     const startDrag = (pageX) => {
       isDragging.current = true;
       startX.current = pageX - el.offsetLeft;
@@ -67,7 +65,6 @@ function TitleCards({ title, category }) {
     };
     const stopDrag = () => (isDragging.current = false);
 
-    // Touch events for mobile
     const onTouchStart = (e) => startDrag(e.touches[0].pageX);
     const onTouchMove = (e) => {
       if (!isDragging.current) return;
@@ -75,7 +72,6 @@ function TitleCards({ title, category }) {
       el.scrollLeft = scrollStart.current - (x - startX.current) * SCROLL_SPEED;
     };
 
-    // Register events
     el.addEventListener("wheel", handleWheel, { passive: false });
     el.addEventListener("mousedown", onMouseDown);
     el.addEventListener("mousemove", onMouseMove);
@@ -85,7 +81,6 @@ function TitleCards({ title, category }) {
     el.addEventListener("touchmove", onTouchMove);
     el.addEventListener("touchend", stopDrag);
 
-    // Cleanup events
     return () => {
       el.removeEventListener("wheel", handleWheel);
       el.removeEventListener("mousedown", onMouseDown);
@@ -99,22 +94,24 @@ function TitleCards({ title, category }) {
   }, []);
 
   return (
-    <div className="mt-12 mb-8 p-6">
+    <div className="mt-6 sm:mt-10 md:mt-12 mb-6 sm:mb-8 md:mb-10 px-3 sm:px-4 md:px-6">
       {/* Section title */}
-      <h2 className="mb-4 text-2xl font-bold text-white">
+      <h2 className="mb-3 sm:mb-4 text-lg sm:text-xl md:text-2xl font-bold text-white">
         {title || "Popular on Netflix"}
       </h2>
 
       {/* Horizontal card list */}
       <div
         ref={cardsRef}
-        className="flex overflow-x-auto gap-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none scroll-smooth"
+        className="flex overflow-x-auto gap-3 sm:gap-4 md:gap-5 scrollbar-hide 
+                   cursor-grab active:cursor-grabbing select-none scroll-smooth"
       >
         {apiData.map((movie) => (
           <Link
             key={movie.id}
             to={`/player/${movie.id}`}
-            className="relative group w-60 h-36 shrink-0 rounded-md overflow-hidden shadow-md"
+            className="relative group shrink-0 rounded-md overflow-hidden shadow-md
+                       w-32 h-20 xs:w-36 xs:h-24 sm:w-44 sm:h-28 md:w-60 md:h-36"
           >
             {movie.backdrop_path && (
               <img
@@ -128,7 +125,9 @@ function TitleCards({ title, category }) {
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             {/* Movie title */}
-            <p className="absolute bottom-2 left-2 text-sm font-medium text-white drop-shadow-md line-clamp-2">
+            <p className="absolute bottom-1 left-1 xs:bottom-2 xs:left-2 
+                          text-[10px] xs:text-xs sm:text-sm md:text-base 
+                          font-medium text-white drop-shadow-md line-clamp-2">
               {movie.original_title}
             </p>
           </Link>

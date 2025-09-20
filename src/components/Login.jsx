@@ -8,7 +8,7 @@ const Login = () => {
 
   // Common styles for input fields
   const inputClass =
-    "w-full h-12 px-4 my-3 text-sm font-medium text-white bg-neutral-600 rounded-sm placeholder-gray-300";
+    "w-full h-10 sm:h-12 px-3 sm:px-4 my-2 sm:my-3 text-sm sm:text-base font-medium text-white bg-neutral-600 rounded-sm placeholder-gray-300";
 
   // Animation variants for sliding forms
   const variants = {
@@ -18,15 +18,19 @@ const Login = () => {
   };
 
   return (
-    <section className="h-screen bg-cover bg-center bg-[linear-gradient(#0000007e,#0000007e),url('./assets/Images/background.jpg')]">
+    <section className="min-h-screen bg-cover bg-center bg-[linear-gradient(#0000007e,#0000007e),url('./assets/Images/background.jpg')]">
       {/* Logo */}
-      <header className="p-8">
-        <img src={Logo} alt="Netflix Logo" className="w-36 cursor-pointer" />
+      <header className="p-4 sm:p-8">
+        <img
+          src={Logo}
+          alt="Netflix Logo"
+          className="w-24 sm:w-36 cursor-pointer"
+        />
       </header>
 
       {/* Auth Container */}
-      <div className="flex items-center justify-center">
-        <div className="w-full max-w-md p-10 bg-black/75 rounded-sm overflow-hidden">
+      <div className="flex items-center justify-center px-4 sm:px-0">
+        <div className="w-full max-w-sm sm:max-w-md px-6 sm:px-10 py-8 sm:py-10 bg-black/75 rounded-sm overflow-hidden">
           {/* Animated Form */}
           <AnimatePresence mode="wait" custom={direction}>
             <motion.form
@@ -39,7 +43,7 @@ const Login = () => {
               transition={{ duration: 0.4 }}
             >
               {/* Title */}
-              <h1 className="mb-7 text-center text-4xl font-semibold text-white">
+              <h1 className="mb-6 sm:mb-7 text-center text-2xl sm:text-4xl font-semibold text-white">
                 {signState}
               </h1>
 
@@ -61,14 +65,14 @@ const Login = () => {
               />
 
               {/* Submit Button */}
-              <button className="mt-5 mb-5 h-10 w-full rounded-sm bg-red-600 text-sm font-medium text-white transition hover:bg-red-700">
+              <button className="mt-5 mb-4 sm:mb-5 h-10 sm:h-12 w-full rounded-sm bg-red-600 text-sm sm:text-base font-medium text-white transition hover:bg-red-700">
                 {signState}
               </button>
 
               {/* Remember Me & Help */}
-              <div className="flex items-center justify-between text-sm text-gray-400">
+              <div className="flex items-center justify-between text-xs sm:text-sm text-gray-400">
                 <label className="flex items-center gap-1.5 cursor-pointer">
-                  <input type="checkbox" className="h-4 w-4" />
+                  <input type="checkbox" className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   Remember Me
                 </label>
                 <p className="cursor-pointer hover:underline">Need Help?</p>
@@ -77,7 +81,7 @@ const Login = () => {
           </AnimatePresence>
 
           {/* Toggle between Sign In / Sign Up */}
-          <div className="mt-10 text-center text-sm text-gray-400">
+          <div className="mt-8 sm:mt-10 text-center text-xs sm:text-sm text-gray-400">
             {signState === "Sign In" ? (
               <p>
                 New to Netflix?
