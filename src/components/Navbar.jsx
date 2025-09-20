@@ -1,39 +1,75 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import Logo from "../assets/Images/logo.png";
 import { FaSearch } from "react-icons/fa";
 import { CiBellOn } from "react-icons/ci";
 import ProfileImg from "../assets/Images/profile.png";
 import { IoMdArrowDropdown } from "react-icons/io";
 
-export default function Navbar() {
+const Navbar = () => {
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    const el = navRef.current;
+    const handleScroll = () => {
+      if (window.scrollY >= 80) {
+        el.classList.add("bg-black/90", "shadow-md");
+      } else {
+        el.classList.remove("bg-black/90", "shadow-md");
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="absolute top-0 left-0 w-full z-20 flex justify-between text-sm items-center p-3 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
-      <div className="flex items-center gap-12 p-5">
-        <img src={Logo} alt="Neflex" className="w-20 cursor-pointer" />
-        <ul className="flex gap-5">
-          <li>Home</li>
-          <li>TV Shows</li>
-          <li>Movies</li>
-          <li>New & Popular</li>
-          <li>My List</li>
-          <li>Browser By Languague</li>
+    <header
+      ref={navRef}
+      className="
+        fixed top-0 left-0 z-20 w-full
+        flex items-center justify-between
+        p-3 text-sm
+        bg-gradient-to-b from-black/60 via-black/30 to-transparent
+        transition-all duration-300
+      "
+    >
+      {/* Logo + menu */}
+      <nav className="flex items-center gap-12 px-5">
+        <img src={Logo} alt="Netflix" className="w-20 cursor-pointer" />
+        <ul className="flex gap-5 text-gray-200">
+          <li className="cursor-pointer hover:text-white">Home</li>
+          <li className="cursor-pointer hover:text-white">TV Shows</li>
+          <li className="cursor-pointer hover:text-white">Movies</li>
+          <li className="cursor-pointer hover:text-white">New & Popular</li>
+          <li className="cursor-pointer hover:text-white">My List</li>
+          <li className="cursor-pointer hover:text-white">
+            Browse By Language
+          </li>
         </ul>
-      </div>
-      <div className="flex gap-5 items-center">
-        <FaSearch className="w-5 cursor-pointer" />
-        <p>Children</p>
-        <CiBellOn className="text-2xl cursor-pointer" />
+      </nav>
+
+      {/* Actions */}
+      <div className="flex items-center gap-5 pr-5 text-gray-200">
+        <FaSearch className="h-5 w-5 cursor-pointer hover:text-white" />
+        <p className="cursor-pointer hover:text-white">Children</p>
+        <CiBellOn className="text-2xl cursor-pointer hover:text-white" />
+
         <div className="relative group">
           <div className="flex items-center gap-1 cursor-pointer">
-            <img className="w-12 rounded-sm " src={ProfileImg} alt="profile" />
-            <IoMdArrowDropdown className="w-10 cursor-pointer text-2xl z-10" />
+            <img
+              src={ProfileImg}
+              alt="profile"
+              className="w-10 rounded-sm"
+            />
+            <IoMdArrowDropdown className="text-2xl" />
           </div>
 
-          <div className="absolute right-0 top-12 hidden group-hover:flex flex-col gap-3 w-28 bg-white/90 text-black p-4 rounded-md text-sm shadow-lg">
-            <p className="cursor-pointer text-md hover:underline">Sign Out</p>
+          <div className="absolute right-0 top-12 hidden w-28 flex-col gap-3 rounded-md bg-white/90 p-4 text-sm text-black shadow-lg group-hover:flex">
+            <p className="cursor-pointer hover:underline">Sign Out</p>
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
-}
+};
+
+export default Navbar;

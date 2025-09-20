@@ -5,33 +5,31 @@ const Footer = () => {
   return (
     <footer className="bg-black text-gray-400 px-6 py-10">
       {/* Social Icons */}
-      <div className="flex gap-6 justify-center mb-8">
-        <FaInstagram className="cursor-pointer text-2xl hover:text-white transition" />
-        <FaFacebook className="cursor-pointer text-2xl hover:text-white transition" />
-        <FaYoutube className="cursor-pointer text-2xl hover:text-white transition" />
+      <div className="mb-8 flex justify-center gap-6">
+        <FaInstagram className="text-2xl cursor-pointer hover:text-white transition-colors duration-200" />
+        <FaFacebook className="text-2xl cursor-pointer hover:text-white transition-colors duration-200" />
+        <FaYoutube className="text-2xl cursor-pointer hover:text-white transition-colors duration-200" />
       </div>
 
       {/* Links */}
-      <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 text-sm max-w-4xl mx-auto mb-8">
-        <li className="hover:underline cursor-pointer">Audio Description</li>
-        <li className="hover:underline cursor-pointer">Help Centre</li>
-        <li className="hover:underline cursor-pointer">Gift Cards</li>
-        <li className="hover:underline cursor-pointer">Media Centre</li>
-        <li className="hover:underline cursor-pointer">Investor Relations</li>
-        <li className="hover:underline cursor-pointer">Jobs</li>
-        <li className="hover:underline cursor-pointer">Terms of Use</li>
-        <li className="hover:underline cursor-pointer">Privacy</li>
-        <li className="hover:underline cursor-pointer">Legal Notices</li>
-        <li className="hover:underline cursor-pointer">Cookie Preferences</li>
-        <li className="hover:underline cursor-pointer">
-          Corporate Information
-        </li>
-        <li className="hover:underline cursor-pointer">Contact Us</li>
+      <ul className="mx-auto mb-8 grid max-w-4xl grid-cols-2 gap-3 text-sm sm:grid-cols-3 md:grid-cols-4">
+        <li className="cursor-pointer hover:underline">Audio Description</li>
+        <li className="cursor-pointer hover:underline">Help Centre</li>
+        <li className="cursor-pointer hover:underline">Gift Cards</li>
+        <li className="cursor-pointer hover:underline">Media Centre</li>
+        <li className="cursor-pointer hover:underline">Investor Relations</li>
+        <li className="cursor-pointer hover:underline">Jobs</li>
+        <li className="cursor-pointer hover:underline">Terms of Use</li>
+        <li className="cursor-pointer hover:underline">Privacy</li>
+        <li className="cursor-pointer hover:underline">Legal Notices</li>
+        <li className="cursor-pointer hover:underline">Cookie Preferences</li>
+        <li className="cursor-pointer hover:underline">Corporate Information</li>
+        <li className="cursor-pointer hover:underline">Contact Us</li>
       </ul>
 
-      {/* CopyRight */}
+      {/* Copyright */}
       <p className="text-center text-sm text-gray-500">
-        © 2025 Netflex. All Rights Reserved.
+        © 2025 Netflix. All Rights Reserved.
       </p>
     </footer>
   );

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 
 function TitleCards({ title, category }) {
   const cardsRef = useRef(null);
@@ -37,7 +38,7 @@ function TitleCards({ title, category }) {
     fetchMovies();
   }, [category]);
 
-  // Scroll/drag logic
+  // Scroll / drag logic
   useEffect(() => {
     const el = cardsRef.current;
     if (!el) return;
@@ -53,36 +54,42 @@ function TitleCards({ title, category }) {
       scrollLeft.current = el.scrollLeft;
     };
 
-    const move = (pageX) => {
+    const handleMouseDown = (e) => start(e.pageX);
+    const handleMouseMove = (e) => {
       if (!isDown.current) return;
-      const x = pageX - el.offsetLeft;
+      const x = e.pageX - el.offsetLeft;
       const walk = (x - startX.current) * SCROLL_SPEED;
       el.scrollLeft = scrollLeft.current - walk;
     };
+    const handleMouseUp = () => (isDown.current = false);
 
-    const end = () => {
-      isDown.current = false;
+    const handleTouchStart = (e) => start(e.touches[0].pageX);
+    const handleTouchMove = (e) => {
+      if (!isDown.current) return;
+      const x = e.touches[0].pageX - el.offsetLeft;
+      const walk = (x - startX.current) * SCROLL_SPEED;
+      el.scrollLeft = scrollLeft.current - walk;
     };
+    const handleTouchEnd = () => (isDown.current = false);
 
-    // Event bindings
     el.addEventListener("wheel", handleWheel, { passive: false });
-    el.addEventListener("mousedown", (e) => start(e.pageX));
-    el.addEventListener("mousemove", (e) => move(e.pageX));
-    el.addEventListener("mouseup", end);
-    el.addEventListener("mouseleave", end);
-    el.addEventListener("touchstart", (e) => start(e.touches[0].pageX));
-    el.addEventListener("touchmove", (e) => move(e.touches[0].pageX));
-    el.addEventListener("touchend", end);
+    el.addEventListener("mousedown", handleMouseDown);
+    el.addEventListener("mousemove", handleMouseMove);
+    el.addEventListener("mouseup", handleMouseUp);
+    el.addEventListener("mouseleave", handleMouseUp);
+    el.addEventListener("touchstart", handleTouchStart);
+    el.addEventListener("touchmove", handleTouchMove);
+    el.addEventListener("touchend", handleTouchEnd);
 
     return () => {
       el.removeEventListener("wheel", handleWheel);
-      el.removeEventListener("mousedown", (e) => start(e.pageX));
-      el.removeEventListener("mousemove", (e) => move(e.pageX));
-      el.removeEventListener("mouseup", end);
-      el.removeEventListener("mouseleave", end);
-      el.removeEventListener("touchstart", (e) => start(e.touches[0].pageX));
-      el.removeEventListener("touchmove", (e) => move(e.touches[0].pageX));
-      el.removeEventListener("touchend", end);
+      el.removeEventListener("mousedown", handleMouseDown);
+      el.removeEventListener("mousemove", handleMouseMove);
+      el.removeEventListener("mouseup", handleMouseUp);
+      el.removeEventListener("mouseleave", handleMouseUp);
+      el.removeEventListener("touchstart", handleTouchStart);
+      el.removeEventListener("touchmove", handleTouchMove);
+      el.removeEventListener("touchend", handleTouchEnd);
     };
   }, []);
 
@@ -97,18 +104,25 @@ function TitleCards({ title, category }) {
         className="flex overflow-x-auto gap-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none scroll-smooth"
       >
         {apiData.map((movie) => (
-          <div key={movie.id} className="flex gap-2.5 relative">
-            <img
-              src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-              alt={movie.original_title}
-              className="w-60 rounded-sm cursor-pointer shrink-0 
-                         transition-transform duration-300 ease-in-out 
-                         hover:z-10 hover:shadow-xl"
-            />
-            <p className="absolute bottom-2.5 right-2.5 text-white">
+          <Link
+            key={movie.id}
+            to={`/player/${movie.id}`}
+            className="relative group w-60 h-36 shrink-0 rounded-md overflow-hidden shadow-md"
+          >
+            {movie.backdrop_path && (
+              <img
+                src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
+                alt={movie.original_title}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            )}
+
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+            <p className="absolute bottom-2 left-2 text-sm font-medium text-white drop-shadow-md line-clamp-2">
               {movie.original_title}
             </p>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
