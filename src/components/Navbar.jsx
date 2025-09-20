@@ -8,8 +8,10 @@ import { IoMdArrowDropdown } from "react-icons/io";
 const Navbar = () => {
   const navRef = useRef(null);
 
+  // Add or remove background & shadow based on scroll position
   useEffect(() => {
     const el = navRef.current;
+
     const handleScroll = () => {
       if (window.scrollY >= 80) {
         el.classList.add("bg-black/90", "shadow-md");
@@ -17,6 +19,7 @@ const Navbar = () => {
         el.classList.remove("bg-black/90", "shadow-md");
       }
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -32,9 +35,10 @@ const Navbar = () => {
         transition-all duration-300
       "
     >
-      {/* Logo + menu */}
+      {/* Logo & Navigation Links */}
       <nav className="flex items-center gap-12 px-5">
-        <img src={Logo} alt="Netflix" className="w-20 cursor-pointer" />
+        <img src={Logo} alt="Netflix Logo" className="w-20 cursor-pointer" />
+
         <ul className="flex gap-5 text-gray-200">
           <li className="cursor-pointer hover:text-white">Home</li>
           <li className="cursor-pointer hover:text-white">TV Shows</li>
@@ -42,24 +46,26 @@ const Navbar = () => {
           <li className="cursor-pointer hover:text-white">New & Popular</li>
           <li className="cursor-pointer hover:text-white">My List</li>
           <li className="cursor-pointer hover:text-white">
-            Browse By Language
+            Browse by Language
           </li>
         </ul>
       </nav>
 
-      {/* Actions */}
+      {/* Action Buttons */}
       <div className="flex items-center gap-5 pr-5 text-gray-200">
+        {/* Search */}
         <FaSearch className="h-5 w-5 cursor-pointer hover:text-white" />
+
+        {/* Kids Section */}
         <p className="cursor-pointer hover:text-white">Children</p>
+
+        {/* Notification Bell */}
         <CiBellOn className="text-2xl cursor-pointer hover:text-white" />
 
+        {/* Profile Dropdown */}
         <div className="relative group">
           <div className="flex items-center gap-1 cursor-pointer">
-            <img
-              src={ProfileImg}
-              alt="profile"
-              className="w-10 rounded-sm"
-            />
+            <img src={ProfileImg} alt="Profile" className="w-10 rounded-sm" />
             <IoMdArrowDropdown className="text-2xl" />
           </div>
 

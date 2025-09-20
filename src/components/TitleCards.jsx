@@ -5,12 +5,14 @@ function TitleCards({ title, category }) {
   const cardsRef = useRef(null);
   const [apiData, setApiData] = useState([]);
 
+  // Scroll configuration
   const SCROLL_SPEED = 1.5;
-  const isDown = useRef(false);
+  const isDragging = useRef(false);
   const startX = useRef(0);
-  const scrollLeft = useRef(0);
+  const scrollStart = useRef(0);
 
-  const options = {
+  // Request options for TMDB API
+  const fetchOptions = {
     method: "GET",
     headers: {
       accept: "application/json",
@@ -19,7 +21,7 @@ function TitleCards({ title, category }) {
     },
   };
 
-  // Fetch movies
+  // Fetch movies from TMDB API
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -27,7 +29,7 @@ function TitleCards({ title, category }) {
           `https://api.themoviedb.org/3/movie/${
             category ?? "now_playing"
           }?language=en-US&page=1`,
-          options
+          fetchOptions
         );
         const data = await res.json();
         setApiData(data.results || []);
@@ -35,70 +37,75 @@ function TitleCards({ title, category }) {
         console.error("Error fetching movies:", err);
       }
     };
+
     fetchMovies();
   }, [category]);
 
-  // Scroll / drag logic
+  // Handle scrolling and dragging events
   useEffect(() => {
     const el = cardsRef.current;
     if (!el) return;
 
+    // Horizontal scroll with mouse wheel
     const handleWheel = (e) => {
       e.preventDefault();
       el.scrollBy({ left: e.deltaY * 3, behavior: "smooth" });
     };
 
-    const start = (pageX) => {
-      isDown.current = true;
+    // Dragging helpers
+    const startDrag = (pageX) => {
+      isDragging.current = true;
       startX.current = pageX - el.offsetLeft;
-      scrollLeft.current = el.scrollLeft;
+      scrollStart.current = el.scrollLeft;
     };
 
-    const handleMouseDown = (e) => start(e.pageX);
-    const handleMouseMove = (e) => {
-      if (!isDown.current) return;
+    const onMouseDown = (e) => startDrag(e.pageX);
+    const onMouseMove = (e) => {
+      if (!isDragging.current) return;
       const x = e.pageX - el.offsetLeft;
-      const walk = (x - startX.current) * SCROLL_SPEED;
-      el.scrollLeft = scrollLeft.current - walk;
+      el.scrollLeft = scrollStart.current - (x - startX.current) * SCROLL_SPEED;
     };
-    const handleMouseUp = () => (isDown.current = false);
+    const stopDrag = () => (isDragging.current = false);
 
-    const handleTouchStart = (e) => start(e.touches[0].pageX);
-    const handleTouchMove = (e) => {
-      if (!isDown.current) return;
+    // Touch events for mobile
+    const onTouchStart = (e) => startDrag(e.touches[0].pageX);
+    const onTouchMove = (e) => {
+      if (!isDragging.current) return;
       const x = e.touches[0].pageX - el.offsetLeft;
-      const walk = (x - startX.current) * SCROLL_SPEED;
-      el.scrollLeft = scrollLeft.current - walk;
+      el.scrollLeft = scrollStart.current - (x - startX.current) * SCROLL_SPEED;
     };
-    const handleTouchEnd = () => (isDown.current = false);
 
+    // Register events
     el.addEventListener("wheel", handleWheel, { passive: false });
-    el.addEventListener("mousedown", handleMouseDown);
-    el.addEventListener("mousemove", handleMouseMove);
-    el.addEventListener("mouseup", handleMouseUp);
-    el.addEventListener("mouseleave", handleMouseUp);
-    el.addEventListener("touchstart", handleTouchStart);
-    el.addEventListener("touchmove", handleTouchMove);
-    el.addEventListener("touchend", handleTouchEnd);
+    el.addEventListener("mousedown", onMouseDown);
+    el.addEventListener("mousemove", onMouseMove);
+    el.addEventListener("mouseup", stopDrag);
+    el.addEventListener("mouseleave", stopDrag);
+    el.addEventListener("touchstart", onTouchStart);
+    el.addEventListener("touchmove", onTouchMove);
+    el.addEventListener("touchend", stopDrag);
 
+    // Cleanup events
     return () => {
       el.removeEventListener("wheel", handleWheel);
-      el.removeEventListener("mousedown", handleMouseDown);
-      el.removeEventListener("mousemove", handleMouseMove);
-      el.removeEventListener("mouseup", handleMouseUp);
-      el.removeEventListener("mouseleave", handleMouseUp);
-      el.removeEventListener("touchstart", handleTouchStart);
-      el.removeEventListener("touchmove", handleTouchMove);
-      el.removeEventListener("touchend", handleTouchEnd);
+      el.removeEventListener("mousedown", onMouseDown);
+      el.removeEventListener("mousemove", onMouseMove);
+      el.removeEventListener("mouseup", stopDrag);
+      el.removeEventListener("mouseleave", stopDrag);
+      el.removeEventListener("touchstart", onTouchStart);
+      el.removeEventListener("touchmove", onTouchMove);
+      el.removeEventListener("touchend", stopDrag);
     };
   }, []);
 
   return (
     <div className="mt-12 mb-8 p-6">
-      <h2 className="text-2xl font-bold text-white mb-4">
+      {/* Section title */}
+      <h2 className="mb-4 text-2xl font-bold text-white">
         {title || "Popular on Netflix"}
       </h2>
 
+      {/* Horizontal card list */}
       <div
         ref={cardsRef}
         className="flex overflow-x-auto gap-4 scrollbar-hide cursor-grab active:cursor-grabbing select-none scroll-smooth"
@@ -113,10 +120,14 @@ function TitleCards({ title, category }) {
               <img
                 src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
                 alt={movie.original_title}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               />
             )}
+
+            {/* Overlay gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+            {/* Movie title */}
             <p className="absolute bottom-2 left-2 text-sm font-medium text-white drop-shadow-md line-clamp-2">
               {movie.original_title}
             </p>
