@@ -1,16 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import backArrow from "../assets/Images/back_arrow_icon.png";
 
-const TitleCards = ({ title, category }) => {
-  const cardsRef = useRef(null);
-  const [movies, setMovies] = useState([]);
+export default function Player() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [video, setVideo] = useState(null);
 
-  const SCROLL_SPEED = 1.5;
-  const isDragging = useRef(false);
-  const startX = useRef(0);
-  const scrollStart = useRef(0);
-
-  const fetchOptions = {
+  const options = {
     method: "GET",
     headers: {
       accept: "application/json",
@@ -19,115 +16,58 @@ const TitleCards = ({ title, category }) => {
     },
   };
 
-  // Fetch movies
   useEffect(() => {
-    const fetchMovies = async () => {
+    const fetchVideo = async () => {
       try {
         const res = await fetch(
-          `https://api.themoviedb.org/3/movie/${category ?? "now_playing"}?language=en-US&page=1`,
-          fetchOptions
+          `https://api.themoviedb.org/3/movie/${id}/videos?language=en-US`,
+          options
         );
         const data = await res.json();
-        setMovies(data.results || []);
+        const trailer =
+          data.results.find((v) => v.type === "Trailer" && v.site === "YouTube") ||
+          data.results[0];
+        setVideo(trailer || null);
       } catch (err) {
-        console.error("Error fetching movies:", err);
+        console.error("Error fetching video:", err);
       }
     };
+    fetchVideo();
+  }, [id]);
 
-    fetchMovies();
-  }, [category]);
-
-  // Scroll & drag events
-  useEffect(() => {
-    const container = cardsRef.current;
-    if (!container) return;
-
-    const handleWheel = (e) => {
-      e.preventDefault();
-      container.scrollBy({ left: e.deltaY * 3, behavior: "smooth" });
-    };
-
-    const startDrag = (pageX) => {
-      isDragging.current = true;
-      startX.current = pageX - container.offsetLeft;
-      scrollStart.current = container.scrollLeft;
-    };
-
-    const moveDrag = (pageX) => {
-      if (!isDragging.current) return;
-      const x = pageX - container.offsetLeft;
-      const walk = (x - startX.current) * SCROLL_SPEED;
-      container.scrollLeft = scrollStart.current - walk;
-    };
-
-    const stopDrag = () => {
-      isDragging.current = false;
-    };
-
-    const handleMouseDown = (e) => startDrag(e.pageX);
-    const handleMouseMove = (e) => moveDrag(e.pageX);
-    const handleTouchStart = (e) => startDrag(e.touches[0].pageX);
-    const handleTouchMove = (e) => moveDrag(e.touches[0].pageX);
-
-    container.addEventListener("wheel", handleWheel, { passive: false });
-    container.addEventListener("mousedown", handleMouseDown);
-    container.addEventListener("mousemove", handleMouseMove);
-    container.addEventListener("mouseup", stopDrag);
-    container.addEventListener("mouseleave", stopDrag);
-    container.addEventListener("touchstart", handleTouchStart);
-    container.addEventListener("touchmove", handleTouchMove);
-    container.addEventListener("touchend", stopDrag);
-
-    return () => {
-      container.removeEventListener("wheel", handleWheel);
-      container.removeEventListener("mousedown", handleMouseDown);
-      container.removeEventListener("mousemove", handleMouseMove);
-      container.removeEventListener("mouseup", stopDrag);
-      container.removeEventListener("mouseleave", stopDrag);
-      container.removeEventListener("touchstart", handleTouchStart);
-      container.removeEventListener("touchmove", handleTouchMove);
-      container.removeEventListener("touchend", stopDrag);
-    };
-  }, []);
+  if (!video) {
+    return (
+      <div className="h-screen flex items-center justify-center text-white">
+        Loading trailer...
+      </div>
+    );
+  }
 
   return (
-    <div className="mt-12 mb-8 p-6">
-      <h2 className="mb-4 text-2xl font-bold text-white">
-        {title || "Popular on Netflix"}
-      </h2>
+    <div className="h-screen flex flex-col justify-center items-center text-white bg-black">
+      <img
+        src={backArrow}
+        alt="back"
+        className="absolute top-5 left-5 w-12 cursor-pointer"
+        onClick={() => navigate(-1)}
+      />
 
-      <div
-        ref={cardsRef}
-        className="flex gap-4 overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing select-none scroll-smooth"
-      >
-        {movies.length > 0 ? (
-          movies.map((movie) => (
-            <Link
-              key={movie.id}
-              to={`/player/${movie.id}`}
-              className="relative h-36 w-60 shrink-0 overflow-hidden rounded-md shadow-md group"
-            >
-              {movie.backdrop_path && (
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path}`}
-                  alt={movie.original_title}
-                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                />
-              )}
+      <iframe
+        src={`https://www.youtube.com/embed/${video.key}`}
+        width="90%"
+        height="80%"
+        frameBorder="0"
+        allowFullScreen
+        title={video.name}
+        className="rounded-xl mb-4"
+      ></iframe>
 
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-
-              <p className="absolute bottom-2 left-2 text-sm font-medium text-white drop-shadow-md line-clamp-2">
-                {movie.original_title}
-              </p>
-            </Link>
-          ))
-        ) : (
-          <p className="text-gray-400">No movies found.</p>
-        )}
+      {/* Dòng thông tin phía dưới */}
+      <div className="flex items-center justify-between w-11/12 max-w-4xl text-sm sm:text-base">
+        <p>{video.published_at ? video.published_at.slice(0, 10) : "N/A"}</p>
+        <p className="font-semibold text-center">{video.name || "N/A"}</p>
+        <p>{video.type || "N/A"}</p>
       </div>
     </div>
   );
-};
-
-export default TitleCards;
+}
