@@ -3,7 +3,7 @@ import { FaPlay } from "react-icons/fa6";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import YouTube from "react-youtube";
 
-const API_KEY = "891bcedf162f3c781893f569626816bf"; // TMDB API Key
+const API_KEY = "891bcedf162f3c781893f569626816bf"; 
 
 // Hero Banner with background trailer
 const Hero = () => {
