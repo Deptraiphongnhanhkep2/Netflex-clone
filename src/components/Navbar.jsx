@@ -27,7 +27,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Đóng dropdown khi click ra ngoài
+  // Close desktop dropdown when click outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (!navRef.current.contains(e.target)) {
@@ -101,8 +101,35 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Dropdown Menu */}
-      {/* (giữ nguyên như bạn viết) */}
-      {/* ... */}
+      {mobileMenu && (
+        <div className="absolute top-full left-0 w-full bg-black/95 text-white flex flex-col gap-4 px-6 py-6 md:hidden">
+          <ul className="flex flex-col gap-4 text-lg">
+            <li className="cursor-pointer hover:text-gray-300">Home</li>
+            <li className="cursor-pointer hover:text-gray-300">TV Shows</li>
+            <li className="cursor-pointer hover:text-gray-300">Movies</li>
+            <li className="cursor-pointer hover:text-gray-300">New & Popular</li>
+            <li className="cursor-pointer hover:text-gray-300">My List</li>
+            <li className="cursor-pointer hover:text-gray-300">Browse by Language</li>
+          </ul>
+
+          {/* Profile Section (Mobile) */}
+          <div className="flex items-center gap-3 border-t border-gray-600 pt-4">
+            <img src={ProfileImg} alt="Profile" className="w-10 rounded-sm" />
+            <button
+              onClick={() => setMobileProfile((prev) => !prev)}
+              className="flex items-center gap-1"
+            >
+              Profile <IoMdArrowDropdown />
+            </button>
+          </div>
+
+          {mobileProfile && (
+            <div className="ml-12 mt-2 flex flex-col gap-2 text-gray-200 text-sm">
+              <p className="cursor-pointer hover:underline">Sign Out</p>
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 };

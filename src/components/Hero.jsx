@@ -43,7 +43,7 @@ const Hero = () => {
 
   return (
     <section className="relative min-h-[70vh] sm:min-h-screen w-full overflow-hidden bg-black">
-      {/* Background Video for desktop */}
+      {/* Background Video (desktop) */}
       {trailerKey && (
         <div className="absolute inset-0 hidden sm:block">
           <YouTube
@@ -64,18 +64,18 @@ const Hero = () => {
               },
             }}
           />
-          {/* Overlay để làm tối video */}
+          {/* Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-transparent to-black/70" />
         </div>
       )}
 
-      {/* Background Image (mobile or fallback) */}
-      {(!trailerKey || !movie) && movie?.backdrop_path && (
+      {/* Background Image (mobile fallback) */}
+      {movie?.backdrop_path && (
         <img
           src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
           alt={movie.title}
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover sm:hidden"
         />
       )}
 
